@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Usuário</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">UPA Norte</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pacientes.listar_pacientes') }}"></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pertences.listar_pertences') }}"></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('itens_perdidos.listar_itens_perdidos') }}">Itens Perdidos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user.cadastrar_usuario') }}">Admin</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Sair</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Cadastro de Usuário</h1>
+        <form id="cadastroForm" action="{{ url_for('user.cadastrar_usuario') }}" method="POST" autocomplete="off">
+            <div class="form-group">
+                <label for="username">Nome de Usuário:</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Função:</label>
+                <select id="role" name="role" class="form-control" required>
+                    <option value="user">Usuário</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
+            <a href="{{ url_for('pacientes.index') }}" class="btn btn-secondary mt-3">Início</a>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    <script>
+        // Captura o envio do formulário e exibe o alerta ao usuário
+        document.getElementById("cadastroForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+            
+            // Envie o formulário via AJAX
+            fetch('/cadastrar_usuario', {
+                method: 'POST',
+                body: new FormData(document.getElementById('cadastroForm'))
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Verifique se a operação foi bem-sucedida
+                if (data.success) {
+                    // Se a operação foi bem-sucedida, exiba o alerta de sucesso
+                    Swal.fire({
+                        position: "center",
+                        icon: "success",
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 2000 // Define a duração do alerta em milissegundos (2 segundos)
+                    }).then(() => {
+                        // Após o alerta de sucesso, redirecione o usuário para a página de início
+                        window.location.href = "{{ url_for('pacientes.index') }}";
+                    });
+                } else {
+                    // Se houve um erro, exiba o alerta de erro
+                    Swal.fire({
+                        position: "center",
+                        icon: "error",
+                        title: "Erro",
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+            });
+        });
+    </script>
+</body>
+</html>

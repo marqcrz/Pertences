@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Login</h1>
+        <form id="loginForm" action="{{ url_for('user.validar') }}" method="POST" autocomplete="off">
+            <div class="form-group">
+                <label for="username">Nome de Usuário:</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Login</button>
+            <a href="{{ url_for('user.cadastrar_usuario') }}" class="btn btn-secondary mt-3">Cadastrar</a>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    <script>
+        // Captura o envio do formulário e exibe o alerta ao usuário
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+            
+            // Envie o formulário via AJAX
+            fetch('/validar', {
+                method: 'POST',
+                body: new FormData(document.getElementById('loginForm'))
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Verifique se a operação foi bem-sucedida
+                if (data.success) {
+                    // Se a operação foi bem-sucedida, exiba o alerta de sucesso
+                    Swal.fire({
+                        position: "center",
+                        icon: "success",
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 2000 // Define a duração do alerta em milissegundos (2 segundos)
+                    }).then(() => {
+                        // Após o alerta de sucesso, redirecione o usuário para a página de início
+                        window.location.href = "{{ url_for('pacientes.index') }}";
+                    });
+                } else {
+                    // Se houve um erro, exiba o alerta de erro
+                    Swal.fire({
+                        position: "center",
+                        icon: "error",
+                        title: "Erro",
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+            });
+        });
+    </script>
+</body>
+</html>

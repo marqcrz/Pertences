@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Exclusão</title>
+    <!--<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <script>
+        Swal.fire({
+            title: "Você tem certeza?",
+            text: "A exclusão não poderá ser revertida!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sim, excluir!",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Se o usuário confirmar, enviar uma solicitação POST para excluir o item
+                fetch("{{ url_for('itens_perdidos.excluir_item_perdido', id=item_perdido.id) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Erro ao excluir o item');
+                }).then(data => {
+                    Swal.fire({
+                        position: "center",
+                        icon: "success",
+                        title: "Item excluído com sucesso!",
+                        showConfirmButton: false,
+                        timer: 1000
+                    }).then(() => {
+                        // Redirecionar para a página de listar itens perdidos após a exclusão
+                        window.location.href = "{{ url_for('itens_perdidos.listar_itens_perdidos') }}";
+                    });
+                }).catch(error => {
+                    Swal.fire({
+                        position: "center",
+                        icon: "error",
+                        title: error.message,
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                });
+            } else {
+                window.location.href = "{{ url_for('itens_perdidos.listar_itens_perdidos') }}";
+            }
+        });
+    </script> 
+</body>
+</html>
