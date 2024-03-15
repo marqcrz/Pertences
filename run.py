@@ -4,8 +4,6 @@ import os
 
 app = create_app()
 
-app.secret_key = 'segredo'
-
 app.config['UPLOAD_FOLDER'] = '../app/templates/imagens/'
 
 @app.route('/imagens/<path:filename>')
