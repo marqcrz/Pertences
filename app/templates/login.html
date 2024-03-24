@@ -67,7 +67,15 @@
             <button type="submit" class="btn btn-primary">Entrar</button>
         </form>
 </div>
+<script>
+    // Definir o foco no campo de entrada de usuário
+    document.getElementById('username').focus();
 
+    // Transformar o texto em maiúsculas enquanto o usuário digita
+    document.getElementById('username').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+</script>
 <script>
     // Remove a mensagem de erro após 5 segundos
     setTimeout(function() {

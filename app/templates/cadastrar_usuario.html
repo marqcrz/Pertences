@@ -44,6 +44,21 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script>
+        // Definir o foco no campo de entrada de usuário
+        document.getElementById('username').focus();
+    
+        // Transformar o texto em maiúsculas enquanto o usuário digita
+        document.getElementById('username').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+        document.getElementById('name').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+        document.getElementById('email').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    </script>
+    <script>
         // Intercepta o envio do formulário via AJAX
         document.getElementById('cadastroForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Impede o envio padrão do formulário
