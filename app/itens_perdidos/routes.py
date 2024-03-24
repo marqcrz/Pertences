@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, Response
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, Response, session
 from app.models import ItemPerdido
 from app import db
 import os
@@ -11,6 +11,17 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 itens_perdidos_routes = Blueprint('itens_perdidos', __name__)
+
+def is_authenticated():
+    return session.get('authenticated', False)
+
+# Middleware para verificar a autenticação em todas as rotas
+@itens_perdidos_routes.before_request
+def require_login():
+    if not is_authenticated() and request.endpoint and not request.endpoint.startswith('user.login'):
+        # Se o usuário não estiver autenticado e tentar acessar qualquer rota que não seja a de login,
+        # ele será redirecionado para a página de login
+        return redirect(url_for('user.login'))
 
 @itens_perdidos_routes.route('/itens_perdidos')
 def listar_itens_perdidos():

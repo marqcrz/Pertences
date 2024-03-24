@@ -10,36 +10,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="#">UPA Norte</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('pacientes.listar_pacientes') }}"></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('pertences.listar_pertences') }}"></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('itens_perdidos.listar_itens_perdidos') }}">Itens Perdidos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('user.cadastrar_usuario') }}">Admin</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Sair</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
+    {% include 'navbar.html' %}
     <div class="container mt-5">
         <h1 class="text-center mb-4">Sistema de Organização de Pertences</h1>
         <div class="row">
@@ -89,7 +60,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title text-center">Usuários Ativos</h5>
-                        <p class="card-text text-center mt-4">2</p>
+                        <p class="card-text text-center mt-4">{{ total_usuarios }}</p>
                     </div>
                 </div>
             </div>
@@ -110,8 +81,6 @@
                 </div>
             </div>
         </div>
-        
-
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 </body>

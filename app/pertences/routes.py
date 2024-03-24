@@ -1,8 +1,19 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from app.models import Pertence, Paciente
 from app import db
 
 pertences_routes = Blueprint('pertences', __name__)
+
+def is_authenticated():
+    return session.get('authenticated', False)
+
+# Middleware para verificar a autenticação em todas as rotas
+@pertences_routes.before_request
+def require_login():
+    if not is_authenticated() and request.endpoint and not request.endpoint.startswith('user.login'):
+        # Se o usuário não estiver autenticado e tentar acessar qualquer rota que não seja a de login,
+        # ele será redirecionado para a página de login
+        return redirect(url_for('user.login'))
 
 @pertences_routes.route('/pertences')
 def listar_pertences():

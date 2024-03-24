@@ -1,18 +1,30 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from app.models import Paciente, ItemPerdido, Pertence
+from flask import Blueprint, render_template, request, redirect, url_for, session
+from app.models import Paciente, ItemPerdido, Pertence, User
 from app import db
 from datetime import datetime
 
 pacientes_routes = Blueprint('pacientes', __name__)
 
+def is_authenticated():
+    return session.get('authenticated', False)
+
+# Middleware para verificar a autenticação em todas as rotas
+@pacientes_routes.before_request
+def require_login():
+    if not is_authenticated() and request.endpoint and not request.endpoint.startswith('user.login'):
+        # Se o usuário não estiver autenticado e tentar acessar qualquer rota que não seja a de login,
+        # ele será redirecionado para a página de login
+        return redirect(url_for('user.login'))
+
 @pacientes_routes.route('/index')
 def index():
     total_pacientes = Paciente.query.count()
     total_pertences = Pertence.query.count()
+    total_usuarios = User.query.count()
     total_itens_perdidos = ItemPerdido.query.count()
     devolvido_itens_perdidos = ItemPerdido.query.filter_by(encontrado='SIM').count()
     nao_devolvido_itens_perdidos = ItemPerdido.query.filter_by(encontrado='NÃO').count()
-    return render_template('index.html', total_pacientes=total_pacientes, total_itens_perdidos=total_itens_perdidos,total_pertences=total_pertences, devolvido_itens_perdidos=devolvido_itens_perdidos, nao_devolvido_itens_perdidos=nao_devolvido_itens_perdidos)
+    return render_template('index.html', total_pacientes=total_pacientes, total_itens_perdidos=total_itens_perdidos,total_pertences=total_pertences, devolvido_itens_perdidos=devolvido_itens_perdidos, nao_devolvido_itens_perdidos=nao_devolvido_itens_perdidos, total_usuarios=total_usuarios)
 
 
 @pacientes_routes.route('/pacientes')

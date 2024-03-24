@@ -1,0 +1,31 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('pacientes.index') }}">UPA Norte</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pacientes.listar_pacientes') }}"></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pertences.listar_pertences') }}"></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('itens_perdidos.listar_itens_perdidos') }}">Itens Perdidos</a>
+                    </li>
+                    <li class="nav-item">
+                        {% if session.authenticated and session.role == "admin" %}
+                            <a class="nav-link" href="{{ url_for('user.cadastrar_usuario') }}">Admin</a>
+                        {% endif %}
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user.sair') }}">Sair</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+</nav>
