@@ -64,3 +64,48 @@ def cadastrar_usuario():
     # Se o método não for POST, retornar uma mensagem de erro
     elif request.method == 'GET':
         return render_template('cadastrar_usuario.html')
+    
+@usuario_routes.route('/cadastrar_usuario/<int:id>', methods=['GET', 'POST'])
+def editar_usuario(username):
+
+    usuario = username.query.get_or_404(username)
+    
+    if request.method == 'POST':
+        # Atualizar os dados do item perdido
+        usuario.username = request.form['username'] 
+        usuario.name = request.form['name'] 
+        usuario.password = request.form['password'] 
+        usuario.email = request.form['email'] 
+        usuario.role = request.form['role'] 
+
+        usuario.username = usuario.username.upper()
+        usuario.name = usuario.name.upper()
+        usuario.password = usuario.password.upper() 
+        usuario.email = usuario.email.upper() 
+        usuario.role = usuario.role.upper() 
+
+        db.session.commit()
+        
+        return redirect(url_for('usuario.cadastrar_usuario'))
+    
+    return render_template('cadastrar_usuario.html', usuario=usuario)
+
+@usuario_routes.route('/listar_usuarios')
+def listar_usuarios():
+    # Consulte o banco de dados para obter todos os usuários cadastrados
+    usuarios = User.query.all()
+
+    # Formate os dados dos usuários em um formato JSON
+    usuarios_json = []
+    for usuario in usuarios:
+        usuario_json = {
+            'id': usuario.id,
+            'username': usuario.username,
+            'email': usuario.email
+            # Adicione outros atributos do usuário conforme necessário
+        }
+        usuarios_json.append(usuario_json)
+
+    # Retorne os dados dos usuários como uma resposta JSON
+    return jsonify(usuarios_json)
+
