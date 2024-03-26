@@ -27,13 +27,9 @@
     </style>
 </head>
 <body>
-    <!-- Seu código HTML existente aqui -->
-
     <div class="container mt-5">
         <div class="row">
-            <!-- Dividindo a página em duas colunas -->
             <div class="col-md-6">
-                <!-- Formulário de cadastro -->
                 <h1 class="text-center mb-4">Cadastro de Usuário</h1>
                 <form id="cadastroForm" action="{{ url_for('user.cadastrar_usuario') }}" method="POST" autocomplete="off">
                     <div class="form-group">
@@ -64,14 +60,10 @@
                 </form>
             </div>
             <div class="col-md-6">
-                <!-- Lista de usuários cadastrados -->
                 <h1 class="text-center mb-4">Lista de Usuários</h1>
                 <div id="userList">
-                    <!-- Listagem de usuários -->
-                    <!-- Os usuários serão adicionados dinamicamente aqui -->
                 </div>
                 <button class="btn btn-danger" id="deleteUserBtn">Excluir</button>
-                <button class="btn btn-secondary" id="editUserBtn">Editar</button>
             </div>
         </div>
     </div>
@@ -79,15 +71,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script>
-        // Função para carregar a lista de usuários cadastrados
         function carregarUsuarios() {
             fetch('/listar_usuarios')
                 .then(response => response.json())
                 .then(data => {
-                    // Limpar a lista atual de usuários
                     document.getElementById('userList').innerHTML = '';
-    
-                    // Adicionar cada usuário à lista
+
                     data.forEach(usuario => {
                         const userCard = `
                             <div class="user-card" data-id="${usuario.id}">
@@ -97,89 +86,51 @@
                         `;
                         document.getElementById('userList').innerHTML += userCard;
                     });
-    
-                    // Adicionar evento de clique aos itens da lista após carregar os usuários
+
                     adicionarEventoClique();
                 })
                 .catch(error => console.error('Erro ao carregar usuários:', error));
         }
         
-        // Função para adicionar evento de clique aos itens da lista
         function adicionarEventoClique() {
             var userList = document.getElementById('userList');
             var userCards = userList.getElementsByClassName('user-card');
             Array.from(userCards).forEach(function(userCard) {
                 userCard.addEventListener('click', function() {
-                    // Remover a classe 'selected' de todos os itens
                     Array.from(userCards).forEach(function(card) {
                         card.classList.remove('selected');
                     });
-                    // Adicionar a classe 'selected' ao item clicado
                     this.classList.add('selected');
                 });
             });
         }
 
-        // Função para preencher os inputs com os detalhes do usuário selecionado
-        function preencherInputs(usuarioSelecionado) {
-            var username = usuarioSelecionado.querySelector('h5').innerText;
-            var email = usuarioSelecionado.querySelector('p').innerText;
-
-            // Preencher os inputs com os detalhes do usuário selecionado
-            document.getElementById('username').value = username;
-            document.getElementById('email').value = email;
-        }
-
-        // Chamar a função para carregar os usuários quando a página carregar
-        window.addEventListener('load', function() {
-            carregarUsuarios();
-            adicionarEventoClique();
-        });
-
-        // Evento de clique do botão "Editar"
-        document.getElementById('editUserBtn').addEventListener('click', function() {
-            // Obter o usuário selecionado
+        function excluirUsuario() {
             var selectedUser = document.querySelector('.user-card.selected');
             if (!selectedUser) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Nenhum usuário selecionado!',
-                    text: 'Por favor, selecione um usuário para editar.'
+                    text: 'Por favor, selecione um usuário para excluir.'
                 });
                 return;
             }
 
-            // Preencher os inputs com os detalhes do usuário selecionado
-            preencherInputs(selectedUser);
-        });
+            var userId = selectedUser.getAttribute('data-id');
 
-        // Intercepta o envio do formulário via AJAX
-        document.getElementById('cadastroForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Impede o envio padrão do formulário
-            var form = this;
-            var formData = new FormData(form); // Obtém os dados do formulário
-    
-            // Envia uma solicitação AJAX para cadastrar o usuário
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
+            fetch('/excluir_usuario/' + userId, {
+                method: 'DELETE'
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Se o cadastro for bem-sucedido, exibe um SweetAlert
+                    carregarUsuarios();
                     Swal.fire({
                         icon: 'success',
-                        title: 'Usuário cadastrado com sucesso!',
+                        title: 'Usuário excluído com sucesso!',
                         text: data.message
-                    }).then(() => {
-                    // Após fechar o alerta de erro, recarrega a página
-                    location.reload();
                     });
-                    // Limpa o formulário após o cadastro bem-sucedido
-                    form.reset();
                 } else {
-                    // Se houver um erro, exibe uma mensagem de erro
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro!',
@@ -188,18 +139,65 @@
                 }
             })
             .catch(error => {
-                console.error('Erro:', error);
-                // Em caso de erro, exibe uma mensagem genérica de erro
+                console.error('Erro ao excluir usuário:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro!',
-                    text: 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.'
-                }).then(() => {
-                    // Após fechar o alerta de erro, recarrega a página
-                    location.reload();
+                    text: 'Ocorreu um erro ao excluir o usuário. Por favor, tente novamente mais tarde.'
                 });
             });
+        }
+
+        window.addEventListener('load', function() {
+            carregarUsuarios();
+            document.getElementById('deleteUserBtn').addEventListener('click', excluirUsuario);
         });
     </script>
+<script>
+    // Intercepta o envio do formulário via AJAX
+    document.getElementById('cadastroForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Impede o envio padrão do formulário
+        var form = this;
+        var formData = new FormData(form); // Obtém os dados do formulário
+
+        // Envia uma solicitação AJAX para cadastrar o usuário
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Se o cadastro for bem-sucedido, exibe um SweetAlert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuário cadastrado com sucesso!',
+                    text: data.message
+                }).then(() => {
+                    // Após fechar o alerta de sucesso, recarrega a lista de usuários
+                    carregarUsuarios();
+                });
+                // Limpa o formulário após o cadastro bem-sucedido
+                form.reset();
+            } else {
+                // Se houver um erro, exibe uma mensagem de erro
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            // Em caso de erro, exibe uma mensagem genérica de erro
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.'
+            });
+        });
+    });
+</script>
 </body>
 </html>

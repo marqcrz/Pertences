@@ -109,3 +109,10 @@ def listar_usuarios():
     # Retorne os dados dos usuários como uma resposta JSON
     return jsonify(usuarios_json)
 
+@usuario_routes.route('/excluir_usuario/<int:id>', methods=['DELETE'])
+def excluir_usuario(id):
+    usuario = User.query.get_or_404(id)
+    db.session.delete(usuario)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Usuário excluído com sucesso'})
+
