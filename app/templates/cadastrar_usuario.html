@@ -3,86 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Usuário</title>
+    <title>Cadastro de Usuário</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .user-card {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .user-card:hover {
+            background-color: #f5f5f5;
+        }
+        .user-card .btn {
+            margin-top: 10px;
+        }
+        .selected {
+            background-color: #d4edda !important; /* Cor verde suave */
+        }
+    </style>
 </head>
 <body>
-    {% include 'navbar.html' %}
-
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Cadastro de Usuário</h1>
-        <form id="cadastroForm" action="{{ url_for('user.cadastrar_usuario') }}" method="POST" autocomplete="off">
-            <div class="form-group">
-                <label for="username">Usuário:</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+        <div class="row">
+            <div class="col-md-6">
+                <h1 class="text-center mb-4">Cadastro de Usuário</h1>
+                <form id="cadastroForm" action="{{ url_for('user.cadastrar_usuario') }}" method="POST" autocomplete="off">
+                    <div class="form-group">
+                        <label for="username">Usuário:</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Nome:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Senha:</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Função:</label>
+                        <select id="role" name="role" class="form-control" required>
+                            <option value="user">Usuário</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
+                    <a href="{{ url_for('pacientes.index') }}" class="btn btn-secondary mt-3">Início</a>
+                </form>
             </div>
-            <div class="form-group">
-                <label for="username">Nome:</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+            <div class="col-md-6">
+                <h1 class="text-center mb-4">Lista de Usuários</h1>
+                <div id="userList">
+                </div>
+                <button class="btn btn-danger" id="deleteUserBtn">Excluir</button>
             </div>
-            <div class="form-group">
-                <label for="password">Senha:</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="email">E-mail:</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="role">Função:</label>
-                <select id="role" name="role" class="form-control" required>
-                    <option value="user">Usuário</option>
-                    <option value="admin">Administrador</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
-            <a href="{{ url_for('pacientes.index') }}" class="btn btn-secondary mt-3">Início</a>
-        </form>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script>
-        // Definir o foco no campo de entrada de usuário
-        document.getElementById('username').focus();
-    
-        // Transformar o texto em maiúsculas enquanto o usuário digita
-        document.getElementById('username').addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
-        document.getElementById('name').addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
-        document.getElementById('email').addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
-    </script>
-    <script>
-        // Intercepta o envio do formulário via AJAX
-        document.getElementById('cadastroForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Impede o envio padrão do formulário
-            var form = this;
-            var formData = new FormData(form); // Obtém os dados do formulário
-    
-            // Envia uma solicitação AJAX para cadastrar o usuário
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
+        function carregarUsuarios() {
+            fetch('/listar_usuarios')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('userList').innerHTML = '';
+
+                    data.forEach(usuario => {
+                        const userCard = `
+                            <div class="user-card" data-id="${usuario.id}">
+                                <h5>${usuario.username}</h5>
+                                <p>${usuario.email}</p>
+                            </div>
+                        `;
+                        document.getElementById('userList').innerHTML += userCard;
+                    });
+
+                    adicionarEventoClique();
+                })
+                .catch(error => console.error('Erro ao carregar usuários:', error));
+        }
+        
+        function adicionarEventoClique() {
+            var userList = document.getElementById('userList');
+            var userCards = userList.getElementsByClassName('user-card');
+            Array.from(userCards).forEach(function(userCard) {
+                userCard.addEventListener('click', function() {
+                    Array.from(userCards).forEach(function(card) {
+                        card.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+        }
+
+        function excluirUsuario() {
+            var selectedUser = document.querySelector('.user-card.selected');
+            if (!selectedUser) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nenhum usuário selecionado!',
+                    text: 'Por favor, selecione um usuário para excluir.'
+                });
+                return;
+            }
+
+            var userId = selectedUser.getAttribute('data-id');
+
+            fetch('/excluir_usuario/' + userId, {
+                method: 'DELETE'
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Se o cadastro for bem-sucedido, exibe um SweetAlert
+                    carregarUsuarios();
                     Swal.fire({
                         icon: 'success',
-                        title: 'Usuário cadastrado com sucesso!',
+                        title: 'Usuário excluído com sucesso!',
                         text: data.message
                     });
-                    // Limpa o formulário após o cadastro bem-sucedido
-                    form.reset();
                 } else {
-                    // Se houver um erro, exibe uma mensagem de erro
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro!',
@@ -91,19 +139,65 @@
                 }
             })
             .catch(error => {
-                console.error('Erro:', error);
-                // Em caso de erro, exibe uma mensagem genérica de erro
+                console.error('Erro ao excluir usuário:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro!',
-                    text: 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.'
-                }).then(() => {
-                    // Após fechar o alerta de erro, recarrega a página
-                    location.reload();
+                    text: 'Ocorreu um erro ao excluir o usuário. Por favor, tente novamente mais tarde.'
                 });
             });
+        }
+
+        window.addEventListener('load', function() {
+            carregarUsuarios();
+            document.getElementById('deleteUserBtn').addEventListener('click', excluirUsuario);
         });
     </script>
-    
+<script>
+    // Intercepta o envio do formulário via AJAX
+    document.getElementById('cadastroForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Impede o envio padrão do formulário
+        var form = this;
+        var formData = new FormData(form); // Obtém os dados do formulário
+
+        // Envia uma solicitação AJAX para cadastrar o usuário
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Se o cadastro for bem-sucedido, exibe um SweetAlert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuário cadastrado com sucesso!',
+                    text: data.message
+                }).then(() => {
+                    // Após fechar o alerta de sucesso, recarrega a lista de usuários
+                    carregarUsuarios();
+                });
+                // Limpa o formulário após o cadastro bem-sucedido
+                form.reset();
+            } else {
+                // Se houver um erro, exibe uma mensagem de erro
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            // Em caso de erro, exibe uma mensagem genérica de erro
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.'
+            });
+        });
+    });
+</script>
 </body>
 </html>
