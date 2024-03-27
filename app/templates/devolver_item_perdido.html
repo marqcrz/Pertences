@@ -46,9 +46,11 @@
                 <img src="{{ url_for('servir_imagem', filename=item_perdido.imagem) }}" alt="Imagem do Item" class="img-thumbnail mx-auto" id="imagem" style="max-width: 200px; margin-top: 5px;">
             </div>
             <div class="form-group">
-                <label for="entregador">Responsável pela Devolução:</label>
-                <input type="text" id="entregador" name="entregador" class="form-control" required style="text-transform:uppercase" value="{{ item_perdido.entregador }}" {% if devolvido %}disabled{% endif %}>
-            </div>
+                <div class="form-group">
+
+                    <label for="entregador">Responsável pela Devolução:</label>
+                    <input type="text" id="entregador" name="entregador" class="form-control" required style="text-transform:uppercase" value="{{ session['name'] }}" {% if devolvido %}disabled{% endif %}>
+                </div>
             <div class="form-group">
                 <label for="recebedor">Nome do Recebedor:</label>
                 <input type="text" id="recebedor" name="recebedor" class="form-control" required style="text-transform:uppercase" value="{{ item_perdido.recebedor }}" {% if devolvido %}disabled{% endif %}>

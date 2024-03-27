@@ -17,7 +17,7 @@
                     </li>
                     <li class="nav-item">
                         {% if session.authenticated and session.role == "admin" %}
-                            <a class="nav-link" href="{{ url_for('user.cadastrar_usuario') }}">Admin</a>
+                            <a class="nav-link" href="{{ url_for('user.admin') }}">Admin</a>
                         {% endif %}
                     </li>
                 </ul>

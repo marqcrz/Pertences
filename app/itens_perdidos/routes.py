@@ -1,12 +1,12 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, Response, session
-from app.models import ItemPerdido
+from app.models import ItemPerdido, Local, Categoria
 from app import db
 import os
 from werkzeug.utils import secure_filename
 
 # Diretório onde as imagens serão salvas
-UPLOAD_FOLDER = f"Projeto Pertences/app/templates/imagens"
+UPLOAD_FOLDER = f"pertences/app/templates/imagens"
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
@@ -31,6 +31,9 @@ def listar_itens_perdidos():
 
 @itens_perdidos_routes.route('/itens_perdidos/registrar', methods=['GET', 'POST'])
 def registrar_item_perdido():
+    locais = Local.query.all()  # Mova essa linha para fora do bloco de condição
+    categorias = Categoria.query.all()  # Mova essa linha para fora do bloco de condição
+
     if request.method == 'POST':
         # Obter os dados do formulário
         data_registro_str = request.form['data_registro']
@@ -65,10 +68,10 @@ def registrar_item_perdido():
         novo_item_perdido = ItemPerdido(data_registro=data_registro, descricao=descricao, local=local, encontrado=encontrado, categoria=categoria, imagem=nome_arquivo, entregador=entregador, recebedor=recebedor)
         db.session.add(novo_item_perdido)
         db.session.commit()
-
+        
         return redirect(url_for('itens_perdidos.listar_itens_perdidos'))
-    
-    return render_template('registrar_item_perdido.html')
+
+    return render_template('registrar_item_perdido.html', locais=locais, categorias=categorias)
 
 @itens_perdidos_routes.route('/itens_perdidos/editar_item_perdido/<int:id>', methods=['GET', 'POST'])
 def editar_item_perdido(id):

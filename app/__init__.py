@@ -22,6 +22,12 @@ def create_app():
     from app.usuarios.routes import usuario_routes
     app.register_blueprint(usuario_routes)
 
+    from app.locais.routes import local_routes
+    app.register_blueprint(local_routes)
+
+    from app.categorias.routes import categoria_routes
+    app.register_blueprint(categoria_routes)
+
     # Criar tabelas no banco de dados
     with app.app_context():
         db.create_all()

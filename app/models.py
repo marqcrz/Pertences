@@ -1,4 +1,5 @@
 from datetime import datetime
+from sqlalchemy.orm import relationship
 from app import db
 
 class Paciente(db.Model):
@@ -22,14 +23,15 @@ class Pertence(db.Model):
 class ItemPerdido(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     descricao = db.Column(db.String(200), nullable=False)
-    local = db.Column(db.String(100), nullable=False)
+    local_id = db.Column(db.Integer, db.ForeignKey('local.id'), nullable=False)  # Chave estrangeira para a tabela Local
     encontrado = db.Column(db.String(3), nullable=False)
-    categoria = db.Column(db.String(200), nullable=False)  # Adicionando a coluna categoria
+    categoria = db.Column(db.String(200), nullable=False)
     data_registro = db.Column(db.DateTime, nullable=False)
-    imagem = db.Column(db.String(200), nullable=False)  # Supondo que o caminho para a imagem será armazenado como uma string
+    imagem = db.Column(db.String(200), nullable=False)
     recebedor = db.Column(db.String(200), nullable=True)
     entregador = db.Column(db.String(200), nullable=True)
     data_devolucao = db.Column(db.DateTime, nullable=True)
+    local = relationship("Local")  # Relacionamento com a tabela Local
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,3 +40,11 @@ class User(db.Model):
     password = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     role = db.Column(db.String(50), nullable=False, default='user')
+
+class Local(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome_local = db.Column(db.String(100), unique=True, nullable=False)
+
+class Categoria(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome_categoria = db.Column(db.String(100), unique=True, nullable=False)    

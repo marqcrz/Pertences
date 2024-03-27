@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Usuário</title>
+    <title>Cadastro de Categorias</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .user-card {
+        .categoria-card {
             border: 1px solid #ccc;
             border-radius: 10px;
             padding: 10px;
@@ -15,58 +15,39 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .user-card:hover {
+        .categoria-card:hover {
             background-color: #f5f5f5;
         }
-        .user-card .btn {
+        .categoria-card .btn {
             margin-top: 10px;
         }
         .selected {
             background-color: #d3d3d39d !important; 
         }
-        #userList {
-            max-height: 290px; /* Define a altura máxima */
+        #categoriaList {
+            max-height: 350px; /* Define a altura máxima */
             overflow-y: auto; /* Adiciona scroll vertical quando necessário */
         }
     </style>
 </head>
 <body>
-        {% include 'navbar.html' %}
+    {% include 'navbar.html' %}
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-6">
-                <h1 class="text-center mb-4">Cadastro de Usuário</h1>
-                <form id="cadastroForm" action="{{ url_for('user.cadastrar_usuario') }}" method="POST" autocomplete="off">
+                <h1 class="text-center mb-4">Cadastro de Categorias</h1>
+                <form id="cadastroForm" action="{{ url_for('categoria.cadastrar_categoria') }}" method="POST" autocomplete="off">
                     <div class="form-group">
-                        <label for="username">Usuário:</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="username">Nome:</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Senha:</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">E-mail:</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Função:</label>
-                        <select id="role" name="role" class="form-control" required>
-                            <option value="user">Usuário</option>
-                            <option value="admin">Administrador</option>
-                        </select>
+                        <label for="nome_categoria">Categoria:</label>
+                        <input type="text" class="form-control" id="nome_categoria" name="nome_categoria" required>
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
-                    <a class="btn btn-danger mt-3" id="deleteUserBtn">Excluir</a>
+                    <a class="btn btn-danger mt-3" id="deleteCategoriaBtn">Excluir</a>
                 </form>
             </div>
             <div class="col-md-6">
-                <h1 class="text-center mb-4">Usuários Ativos</h1>
-                <div id="userList">
+                <h1 class="text-center mb-4">Categorias Cadastradas</h1>
+                <div id="categoriaList">
                 </div>
             </div>
         </div>
@@ -75,33 +56,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script>
-        function carregarUsuarios() {
-            fetch('/listar_usuarios')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('userList').innerHTML = '';
+ function carregarCategorias() {
+    fetch('/listar_categorias')
+        .then(response => response.json())
+        .then(data => {
+            // Ordenar as categorias em ordem alfabética
+            data.sort((a, b) => a.nome_categoria.localeCompare(b.nome_categoria));
 
-                    data.forEach(usuario => {
-                        const userCard = `
-                            <div class="user-card" data-id="${usuario.id}">
-                                <h6>${usuario.username}</h6>
-                                <p>${usuario.name}</p>
-                            </div>
-                        `;
-                        document.getElementById('userList').innerHTML += userCard;
-                    });
+            document.getElementById('categoriaList').innerHTML = '';
 
-                    adicionarEventoClique();
-                })
-                .catch(error => console.error('Erro ao carregar usuários:', error));
-        }
+            data.forEach(categoria => {
+                const categoriaCard = `
+                    <div class="categoria-card" data-id="${categoria.id}">
+                        <p>${categoria.nome_categoria}</p>
+                    </div>
+                `;
+                document.getElementById('categoriaList').innerHTML += categoriaCard;
+            });
+
+            adicionarEventoClique();
+        })
+        .catch(error => console.error('Erro ao carregar categorias:', error));
+}
+
         
         function adicionarEventoClique() {
-            var userList = document.getElementById('userList');
-            var userCards = userList.getElementsByClassName('user-card');
-            Array.from(userCards).forEach(function(userCard) {
-                userCard.addEventListener('click', function() {
-                    Array.from(userCards).forEach(function(card) {
+            var categoriaList = document.getElementById('categoriaList');
+            var categoriaCards = categoriaList.getElementsByClassName('categoria-card');
+            Array.from(categoriaCards).forEach(function(categoriaCard) {
+                categoriaCard.addEventListener('click', function() {
+                    Array.from(categoriaCards).forEach(function(card) {
                         card.classList.remove('selected');
                     });
                     this.classList.add('selected');
@@ -109,29 +93,29 @@
             });
         }
 
-        function excluirUsuario() {
-            var selectedUser = document.querySelector('.user-card.selected');
-            if (!selectedUser) {
+        function excluirCategoria() {
+            var selectedCategoria = document.querySelector('.categoria-card.selected');
+            if (!selectedCategoria) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Nenhum usuário selecionado!',
-                    text: 'Por favor, selecione um usuário para excluir.'
+                    title: 'Nenhuma categoria selecionada!',
+                    text: 'Por favor, selecione uma categoria para excluir.'
                 });
                 return;
             }
 
-            var userId = selectedUser.getAttribute('data-id');
+            var categoriaId = selectedCategoria.getAttribute('data-id');
 
-            fetch('/excluir_usuario/' + userId, {
+            fetch('/excluir_categoria/' + categoriaId, {
                 method: 'DELETE'
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    carregarUsuarios();
+                    carregarCategorias();
                     Swal.fire({
                         icon: 'success',
-                        title: 'Usuário excluído com sucesso!',
+                        title: 'Categoria excluída com sucesso!',
                         text: data.message
                     });
                 } else {
@@ -143,20 +127,21 @@
                 }
             })
             .catch(error => {
-                console.error('Erro ao excluir usuário:', error);
+                console.error('Erro ao excluir categoria:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro!',
-                    text: 'Ocorreu um erro ao excluir o usuário. Por favor, tente novamente mais tarde.'
+                    text: 'Ocorreu um erro ao excluir a categoria. Por favor, tente novamente mais tarde.'
                 });
             });
         }
 
         window.addEventListener('load', function() {
-            carregarUsuarios();
-            document.getElementById('deleteUserBtn').addEventListener('click', excluirUsuario);
-        });
-    </script>
+            carregarCategorias();
+            document.getElementById('deleteCategoriaBtn').addEventListener('click', excluirCategoria);
+});
+</script>
+
 <script>
     // Intercepta o envio do formulário via AJAX
     document.getElementById('cadastroForm').addEventListener('submit', function(event) {
@@ -164,7 +149,7 @@
         var form = this;
         var formData = new FormData(form); // Obtém os dados do formulário
 
-        // Envia uma solicitação AJAX para cadastrar o usuário
+        // Envia uma solicitação AJAX para cadastrar a categoria
         fetch(form.action, {
             method: 'POST',
             body: formData
@@ -175,11 +160,11 @@
                 // Se o cadastro for bem-sucedido, exibe um SweetAlert
                 Swal.fire({
                     icon: 'success',
-                    title: 'Usuário cadastrado com sucesso!',
+                    title: 'Categoria cadastrada com sucesso!',
                     text: data.message
                 }).then(() => {
-                    // Após fechar o alerta de sucesso, recarrega a lista de usuários
-                    carregarUsuarios();
+                    // Após fechar o alerta de sucesso, recarrega a lista de categorias
+                    carregarCategorias();
                 });
                 // Limpa o formulário após o cadastro bem-sucedido
                 form.reset();
@@ -213,8 +198,6 @@
             });
         });
     }
-
-    // Chamando a função ao carregar a página
     window.addEventListener('load', function() {
         tornarInputsUppercase();
     });

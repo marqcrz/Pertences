@@ -25,6 +25,8 @@ def login():
         if user and user.password == password:
             session['authenticated'] = True
             session['role'] = user.role  # Armazena o papel do usuário na sessão
+            session['user_id'] = user.id 
+            session['name'] = user.name 
             return redirect(url_for('pacientes.index'))  # Redirecionar para a página desejada após o login
         else:
             error_message = 'Nome de usuário ou senha incorretos'
@@ -64,31 +66,6 @@ def cadastrar_usuario():
     # Se o método não for POST, retornar uma mensagem de erro
     elif request.method == 'GET':
         return render_template('cadastrar_usuario.html')
-    
-@usuario_routes.route('/cadastrar_usuario/<int:id>', methods=['GET', 'POST'])
-def editar_usuario(username):
-
-    usuario = username.query.get_or_404(username)
-    
-    if request.method == 'POST':
-        # Atualizar os dados do item perdido
-        usuario.username = request.form['username'] 
-        usuario.name = request.form['name'] 
-        usuario.password = request.form['password'] 
-        usuario.email = request.form['email'] 
-        usuario.role = request.form['role'] 
-
-        usuario.username = usuario.username.upper()
-        usuario.name = usuario.name.upper()
-        usuario.password = usuario.password.upper() 
-        usuario.email = usuario.email.upper() 
-        usuario.role = usuario.role.upper() 
-
-        db.session.commit()
-        
-        return redirect(url_for('usuario.cadastrar_usuario'))
-    
-    return render_template('cadastrar_usuario.html', usuario=usuario)
 
 @usuario_routes.route('/listar_usuarios')
 def listar_usuarios():
@@ -101,7 +78,7 @@ def listar_usuarios():
         usuario_json = {
             'id': usuario.id,
             'username': usuario.username,
-            'email': usuario.email
+            'name': usuario.name
             # Adicione outros atributos do usuário conforme necessário
         }
         usuarios_json.append(usuario_json)
@@ -111,8 +88,24 @@ def listar_usuarios():
 
 @usuario_routes.route('/excluir_usuario/<int:id>', methods=['DELETE'])
 def excluir_usuario(id):
+    # Verificar se há um usuário autenticado na sessão
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Nenhum usuário autenticado encontrado.'}), 401
+
+    # Obter o ID do usuário atualmente autenticado na sessão
+    id_usuario_autenticado = session['user_id']
+
+    # Verificar se o ID do usuário sendo excluído é o mesmo que o ID do usuário autenticado
+    if id == id_usuario_autenticado:
+        return jsonify({'success': False, 'message': 'Você não pode excluir a si mesmo.'}), 403
+
+    # Proceder com a exclusão do usuário normalmente
     usuario = User.query.get_or_404(id)
     db.session.delete(usuario)
     db.session.commit()
-    return jsonify({'success': True, 'message': 'Usuário excluído com sucesso'})
+    return jsonify({'success': True, 'message': 'Usuário excluído com sucesso'}), 200
 
+@usuario_routes.route('/admin')
+def admin():
+    # Renderiza o template admin.html
+    return render_template('admin.html')
