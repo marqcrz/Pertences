@@ -42,7 +42,7 @@
                 <select class="form-control" id="local" name="local" required>
                     <option value="">Selecione um local</option>
                     {% for local in locais|sort(attribute='nome_local') %}
-                        <option value="{{ local.id }}">{{ local.nome_local }}</option>
+                        <option value="{{ local.nome_local }}">{{ local.nome_local }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -51,7 +51,7 @@
                 <select class="form-control" id="categoria" name="categoria" required>
                     <option value="">Selecione a categoria</option>
                     {% for categoria in categorias|sort(attribute='nome_categoria') %}
-                        <option value="{{ categoria.id }}">{{ categoria.nome_categoria }}</option>
+                        <option value="{{ categoria.nome_categoria }}">{{ categoria.nome_categoria }}</option>
                     {% endfor %}
                 </select>
             </div>

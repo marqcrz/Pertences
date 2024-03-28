@@ -73,6 +73,8 @@ def registrar_item_perdido():
 
     return render_template('registrar_item_perdido.html', locais=locais, categorias=categorias)
 
+
+
 @itens_perdidos_routes.route('/itens_perdidos/editar_item_perdido/<int:id>', methods=['GET', 'POST'])
 def editar_item_perdido(id):
     item_perdido = ItemPerdido.query.get_or_404(id)

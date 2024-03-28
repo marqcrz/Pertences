@@ -1,5 +1,4 @@
 from datetime import datetime
-from sqlalchemy.orm import relationship
 from app import db
 
 class Paciente(db.Model):
@@ -23,7 +22,7 @@ class Pertence(db.Model):
 class ItemPerdido(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     descricao = db.Column(db.String(200), nullable=False)
-    local_id = db.Column(db.Integer, db.ForeignKey('local.id'), nullable=False)  # Chave estrangeira para a tabela Local
+    local = db.Column(db.String(200), nullable=False)
     encontrado = db.Column(db.String(3), nullable=False)
     categoria = db.Column(db.String(200), nullable=False)
     data_registro = db.Column(db.DateTime, nullable=False)
@@ -31,7 +30,6 @@ class ItemPerdido(db.Model):
     recebedor = db.Column(db.String(200), nullable=True)
     entregador = db.Column(db.String(200), nullable=True)
     data_devolucao = db.Column(db.DateTime, nullable=True)
-    local = relationship("Local")  # Relacionamento com a tabela Local
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
