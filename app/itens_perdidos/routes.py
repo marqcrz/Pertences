@@ -6,7 +6,11 @@ import os
 from werkzeug.utils import secure_filename
 
 # Diretório onde as imagens serão salvas
+<<<<<<< HEAD
 UPLOAD_FOLDER = f"pertences/app/templates/imagens"
+=======
+UPLOAD_FOLDER = f"Pertences/app/templates/imagens"
+>>>>>>> 04fa668c31ff3d7b33a5cfbe76af0bf61899e0cc
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
