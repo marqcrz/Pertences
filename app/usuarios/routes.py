@@ -136,9 +136,11 @@ def excluir_usuario(id):
 def admin():
     # Renderiza o template admin.html
     return render_template('admin.html')
+
+    # O código abaixo estava fora da função admin(), corrigido para estar dentro dela
     usuario = User.query.get_or_404(id)
     db.session.delete(usuario)
     db.session.commit()
-    
     return jsonify({'success': True, 'message': 'Usuário excluído com sucesso'})
+
 

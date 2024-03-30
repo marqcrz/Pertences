@@ -22,23 +22,16 @@
             margin-top: 10px;
         }
         .selected {
-<<<<<<< HEAD
             background-color: #d3d3d39d !important; 
         }
         #userList {
             max-height: 290px; /* Define a altura máxima */
             overflow-y: auto; /* Adiciona scroll vertical quando necessário */
-=======
-            background-color: #d4edda !important; /* Cor verde suave */
->>>>>>> 04fa668c31ff3d7b33a5cfbe76af0bf61899e0cc
         }
     </style>
 </head>
 <body>
-<<<<<<< HEAD
         {% include 'navbar.html' %}
-=======
->>>>>>> 04fa668c31ff3d7b33a5cfbe76af0bf61899e0cc
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-6">
@@ -68,7 +61,7 @@
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
-<<<<<<< HEAD
+
                     <a class="btn btn-danger mt-3" id="deleteUserBtn">Excluir</a>
                 </form>
             </div>
@@ -76,16 +69,8 @@
                 <h1 class="text-center mb-4">Usuários Ativos</h1>
                 <div id="userList">
                 </div>
-=======
                     <a href="{{ url_for('pacientes.index') }}" class="btn btn-secondary mt-3">Início</a>
                 </form>
-            </div>
-            <div class="col-md-6">
-                <h1 class="text-center mb-4">Lista de Usuários</h1>
-                <div id="userList">
-                </div>
-                <button class="btn btn-danger" id="deleteUserBtn">Excluir</button>
->>>>>>> 04fa668c31ff3d7b33a5cfbe76af0bf61899e0cc
             </div>
         </div>
     </div>
@@ -102,13 +87,8 @@
                     data.forEach(usuario => {
                         const userCard = `
                             <div class="user-card" data-id="${usuario.id}">
-<<<<<<< HEAD
                                 <h6>${usuario.username}</h6>
                                 <p>${usuario.name}</p>
-=======
-                                <h5>${usuario.username}</h5>
-                                <p>${usuario.email}</p>
->>>>>>> 04fa668c31ff3d7b33a5cfbe76af0bf61899e0cc
                             </div>
                         `;
                         document.getElementById('userList').innerHTML += userCard;
@@ -174,7 +154,6 @@
                 });
             });
         }
-
         window.addEventListener('load', function() {
             carregarUsuarios();
             document.getElementById('deleteUserBtn').addEventListener('click', excluirUsuario);
@@ -226,7 +205,6 @@
         });
     });
 </script>
-<<<<<<< HEAD
 <script>
     // Função para tornar todos os inputs uppercase
     function tornarInputsUppercase() {
@@ -237,13 +215,10 @@
             });
         });
     }
-
     // Chamando a função ao carregar a página
     window.addEventListener('load', function() {
         tornarInputsUppercase();
     });
 </script>
-=======
->>>>>>> 04fa668c31ff3d7b33a5cfbe76af0bf61899e0cc
 </body>
 </html>
