@@ -66,8 +66,6 @@ def cadastrar_usuario():
     # Se o método não for POST, retornar uma mensagem de erro
     elif request.method == 'GET':
         return render_template('cadastrar_usuario.html')
-<<<<<<< HEAD
-=======
     
 @usuario_routes.route('/cadastrar_usuario/<int:id>', methods=['GET', 'POST'])
 def editar_usuario(username):
@@ -93,7 +91,6 @@ def editar_usuario(username):
         return redirect(url_for('usuario.cadastrar_usuario'))
     
     return render_template('cadastrar_usuario.html', usuario=usuario)
->>>>>>> 04fa668c31ff3d7b33a5cfbe76af0bf61899e0cc
 
 @usuario_routes.route('/listar_usuarios')
 def listar_usuarios():
@@ -106,11 +103,8 @@ def listar_usuarios():
         usuario_json = {
             'id': usuario.id,
             'username': usuario.username,
-<<<<<<< HEAD
-            'name': usuario.name
-=======
-            'email': usuario.email
->>>>>>> 04fa668c31ff3d7b33a5cfbe76af0bf61899e0cc
+            'name': usuario.name,
+            'email': usuario.email,
             # Adicione outros atributos do usuário conforme necessário
         }
         usuarios_json.append(usuario_json)
@@ -120,7 +114,7 @@ def listar_usuarios():
 
 @usuario_routes.route('/excluir_usuario/<int:id>', methods=['DELETE'])
 def excluir_usuario(id):
-<<<<<<< HEAD
+
     # Verificar se há um usuário autenticado na sessão
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Nenhum usuário autenticado encontrado.'}), 401
@@ -142,10 +136,9 @@ def excluir_usuario(id):
 def admin():
     # Renderiza o template admin.html
     return render_template('admin.html')
-=======
     usuario = User.query.get_or_404(id)
     db.session.delete(usuario)
     db.session.commit()
+    
     return jsonify({'success': True, 'message': 'Usuário excluído com sucesso'})
 
->>>>>>> 04fa668c31ff3d7b33a5cfbe76af0bf61899e0cc
