@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from app import db
 
 class Paciente(db.Model):
@@ -46,3 +46,9 @@ class Local(db.Model):
 class Categoria(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome_categoria = db.Column(db.String(100), unique=True, nullable=False)    
+
+class UserLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    action = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.now(timezone.utc))   

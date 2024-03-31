@@ -11,7 +11,7 @@
     {% include 'navbar.html' %}
 
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Editar Item Perdido</h1>
+        <h1 class="text-center mb-4" style="color: #007bff">Editar Item Perdido</h1>
         <form id="alterarForm" action="{{ url_for('itens_perdidos.editar_item_perdido', id=item_perdido.id) }}" method="POST" autocomplete="off">
             <div class="form-group">
                 <label for="data_registro">Data e Hora de Registro:</label>

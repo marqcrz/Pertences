@@ -1,12 +1,12 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, Response, session
-from app.models import ItemPerdido, Local, Categoria
+from app.models import ItemPerdido, Local, Categoria, UserLog
 from app import db
 import os
 from werkzeug.utils import secure_filename
 
 # Diretório onde as imagens serão salvas
-UPLOAD_FOLDER = f"Pertences/app/templates/imagens"
+UPLOAD_FOLDER = f"../pertences/app/templates/imagens"
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
@@ -22,6 +22,16 @@ def require_login():
         # Se o usuário não estiver autenticado e tentar acessar qualquer rota que não seja a de login,
         # ele será redirecionado para a página de login
         return redirect(url_for('user.login'))
+
+# Defina uma função para registrar logs de usuário
+def registrar_log(usuario_id, acao):
+    log = UserLog(user_id=usuario_id, action=acao)
+    db.session.add(log)
+    db.session.commit()
+
+# Defina uma função para obter o ID do usuário atualmente autenticado
+def obter_id_usuario():
+    return session.get('user_id')
 
 @itens_perdidos_routes.route('/itens_perdidos')
 def listar_itens_perdidos():
@@ -69,6 +79,10 @@ def registrar_item_perdido():
         db.session.add(novo_item_perdido)
         db.session.commit()
         
+        usuario_id = obter_id_usuario()
+        if usuario_id:
+            registrar_log(usuario_id, 'Novo item cadastrado')
+        
         return redirect(url_for('itens_perdidos.listar_itens_perdidos'))
 
     return render_template('registrar_item_perdido.html', locais=locais, categorias=categorias)
@@ -94,6 +108,10 @@ def editar_item_perdido(id):
         item_perdido.encontrado = item_perdido.encontrado.upper()
 
         db.session.commit()
+
+        usuario_id = obter_id_usuario()
+        if usuario_id:
+            registrar_log(usuario_id, f'Item perdido editado (ID: {id})')
         
         return redirect(url_for('itens_perdidos.listar_itens_perdidos'))
     
@@ -106,6 +124,10 @@ def excluir_item_perdido(id):
         db.session.delete(item_perdido)
 
         db.session.commit()
+
+        usuario_id = obter_id_usuario()
+        if usuario_id:
+            registrar_log(usuario_id, f'Item perdido excluído (ID: {id})')
 
         return jsonify({'message': 'Item excluído com sucesso'})
     
@@ -131,6 +153,9 @@ def devolver(id):
         db.session.commit()
 
         devolvido = True  # Define a variável indicando que o item foi devolvido
+        usuario_id = obter_id_usuario()
+        if usuario_id:
+            registrar_log(usuario_id, f'Item perdido devolvido (ID: {id})')
 
     else:
         devolvido = False  # Se não for uma solicitação POST, o item não foi devolvido ainda

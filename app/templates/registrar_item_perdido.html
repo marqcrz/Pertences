@@ -13,7 +13,7 @@
 <body>
     {% include 'navbar.html' %}
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Registrar Item Perdido</h1>
+        <h1 class="text-center mb-4" style="color: #007bff">Registrar Item Perdido</h1>
         <form id="registrarForm" action="{{ url_for('itens_perdidos.registrar_item_perdido') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
             <div class="form-group">
                 <label for="data_registro">Data e Hora de Registro:</label>

@@ -19,7 +19,7 @@
      {% include 'navbar.html' %}
 
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Termo de Devolução de Item</h1>
+        <h1 class="text-center mb-4" style="color: #007bff">Termo de Devolução de Item</h1>
         <form id="devolucaoForm" action="{{ url_for('itens_perdidos.devolver', id=item_perdido.id) }}" method="POST" enctype="multipart/form-data" autocomplete="off">
             <div class="form-group">
                 <label for="data_registro">Registrado no Sistema:</label>

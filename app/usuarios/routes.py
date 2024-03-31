@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
-from app.models import User
+from app.models import User, UserLog
 from app import db
 
 usuario_routes = Blueprint('user', __name__)
@@ -26,14 +26,27 @@ def login():
             session['authenticated'] = True
             session['role'] = user.role  # Armazena o papel do usuário na sessão
             session['user_id'] = user.id 
-            session['name'] = user.name 
+            session['name'] = user.name
+
+            # Registro de log
+            log = UserLog(user_id=user.id, action='Login')
+            db.session.add(log)
+            db.session.commit()
+            
             return redirect(url_for('pacientes.index'))  # Redirecionar para a página desejada após o login
         else:
             error_message = 'Nome de usuário ou senha incorretos'
+
     return render_template('login.html', error_message=error_message)
 
 @usuario_routes.route('/sair')
 def sair():
+
+    id_usuario_autenticado = session['user_id']
+    log = UserLog(user_id=id_usuario_autenticado, action='Logout')
+    db.session.add(log)
+    db.session.commit()
+
     session.pop('authenticated', None)
     flash('Você saiu com sucesso.', 'success')
     return redirect(url_for('user.login'))
@@ -87,7 +100,7 @@ def editar_usuario(username):
         usuario.role = usuario.role.upper() 
 
         db.session.commit()
-        
+
         return redirect(url_for('usuario.cadastrar_usuario'))
     
     return render_template('cadastrar_usuario.html', usuario=usuario)
@@ -130,6 +143,11 @@ def excluir_usuario(id):
     usuario = User.query.get_or_404(id)
     db.session.delete(usuario)
     db.session.commit()
+
+    log = UserLog(user_id=id_usuario_autenticado, action=f'Excluiu o usuário ID (ID: {id})')
+    db.session.add(log)
+    db.session.commit()
+
     return jsonify({'success': True, 'message': 'Usuário excluído com sucesso'}), 200
 
 @usuario_routes.route('/admin')
@@ -137,10 +155,22 @@ def admin():
     # Renderiza o template admin.html
     return render_template('admin.html')
 
-    # O código abaixo estava fora da função admin(), corrigido para estar dentro dela
-    usuario = User.query.get_or_404(id)
-    db.session.delete(usuario)
-    db.session.commit()
-    return jsonify({'success': True, 'message': 'Usuário excluído com sucesso'})
+@usuario_routes.route('/logs')
+def logs():
+    # Consulta os registros de log no banco de dados com a informação do usuário
+    logs = db.session.query(UserLog, User.username).join(User, UserLog.user_id == User.id).all()
 
-
+    # Cria uma lista para armazenar os dados dos logs
+    logs_data = []
+    for log, username in logs:
+        # Cria um dicionário com os dados de cada log e o nome de usuário correspondente
+        log_data = {
+            'id': log.id,
+            'username': username,
+            'action': log.action,
+            'timestamp': log.timestamp.strftime('%Y-%m-%d %H:%M:%S')  # Formata a data e hora
+        }
+        # Adiciona os dados do log à lista de logs
+        logs_data.append(log_data)
+    # Renderiza o template HTML e passa os dados dos logs para ele
+    return render_template('logs.html', logs_data=logs_data)
