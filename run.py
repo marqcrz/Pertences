@@ -1,6 +1,5 @@
 from app import create_app
 from flask import Flask, send_from_directory
-import os
 
 app = create_app()
 app.config['SECRET_KEY'] = 'a5875d9c23a6e44ff1f3c6a58a1758a7842fb170e4d30e8a'
