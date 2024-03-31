@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from app.models import User, UserLog
 from app import db
+from datetime import datetime
 
 usuario_routes = Blueprint('user', __name__)
 
@@ -158,17 +159,18 @@ def admin():
 @usuario_routes.route('/logs')
 def logs():
     # Consulta os registros de log no banco de dados com a informação do usuário
-    logs = db.session.query(UserLog, User.username).join(User, UserLog.user_id == User.id).all()
+    logs = db.session.query(UserLog, User.username, User.role).join(User, UserLog.user_id == User.id).all()
 
     # Cria uma lista para armazenar os dados dos logs
     logs_data = []
-    for log, username in logs:
+    for log, username, role in logs:
         # Cria um dicionário com os dados de cada log e o nome de usuário correspondente
         log_data = {
             'id': log.id,
             'username': username,
             'action': log.action,
-            'timestamp': log.timestamp.strftime('%Y-%m-%d %H:%M:%S')  # Formata a data e hora
+            'timestamp': log.timestamp.strftime('%d/%m/%Y %H:%M:%S'),  # Formata a data e hora
+            'role': role
         }
         # Adiciona os dados do log à lista de logs
         logs_data.append(log_data)
